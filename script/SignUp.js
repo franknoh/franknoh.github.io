@@ -25,9 +25,10 @@ $(function() {
         var isS = false;
         var users;
 
-        firebase.database().ref().once('value').then(function(snapshot) {
-            if (!!snapshot.val()) {
-                users = Object.values(snapshot.val());
+        firebase.firestore().collection('users').get().then(function(snapshot) {
+            if (snapshot.size>0) {
+                var users;
+                snapshot.forEach(function(doc) {users.push(doc.data());});
             } else {
                 users = [];
             }
@@ -109,7 +110,7 @@ $(function() {
             if (is == false) {
                 firebase.auth().createUserWithEmailAndPassword(email, pswd).then(function() {
                     firebase.auth().currentUser.sendEmailVerification().then(function() {
-                        firebase.database().ref(firebase.auth().currentUser.uid).set({
+                        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).set({
                             nickname: id,
                             email: email,
                             profile: $('img#profile').attr('src')
