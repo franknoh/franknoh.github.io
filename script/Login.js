@@ -2,7 +2,7 @@ function login() {
     var _email;
     $('button#complete').click(function(event) {
         event.preventDefault();
-        firebase.database().collection('users').get().then(function(snapshot) {
+        firebase.firestore().collection('users').get().then(function(snapshot) {
             snapshot.forEach(function(childSnapshot) {
                 if (childSnapshot.data().nickname == $('#id').val().replace(/ /g, "")) {
                     _email = childSnapshot.data().email;
@@ -21,10 +21,10 @@ function login() {
                         alert('발송된 이메일을 인증해주세요');
                         firebase.auth().singOut();
                     }else{
-                        if (location.href.startsWith('https://kkotbot-docs.kro.kr/login?redirect=')) {
-                            location.href = location.href.substring('https://kkotbot-docs.kro.kr/login?redirect='.length); //로그인 후 이동
+                        if (location.href.startsWith('https://franknoh.github.io/login?redirect=')) {
+                            location.href = location.href.substring('https://franknoh.github.io/login?redirect='.length); //로그인 후 이동
                         } else {
-                            location.href = 'https://kkotbot-docs.kro.kr/'; //로그인 후 이동
+                            location.href = 'https://franknoh.github.io/'; //로그인 후 이동
                         }
                     }
                 }).catch(function(error) {
@@ -41,10 +41,10 @@ function login() {
 $(function() {
     firebase.auth().onAuthStateChanged(user => {
         if (!!user) {
-            if (location.href.startsWith('https://kkotbot-docs.kro.kr/login?redirect=')) {
-                location.href = location.href.substring('https://kkotbot-docs.kro.kr/login?redirect='.length); //로그인 후 이동
+            if (location.href.startsWith('https://franknoh.github.io/login?redirect=')) {
+                location.href = location.href.substring('https://franknoh.github.io/login?redirect='.length); //로그인 후 이동
             } else {
-                location.href = 'https://kkotbot-docs.kro.kr/'; //로그인 후 이동
+                location.href = 'https://franknoh.github.io/'; //로그인 후 이동
             }
         } else {
             login();
