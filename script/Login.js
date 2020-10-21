@@ -19,7 +19,7 @@ function login() {
                 firebase.auth().signInWithEmailAndPassword(_email, $('#pswd').val()).then(function() {
                     if(!firebase.auth().currentUser.emailVerified){
                         alert('발송된 이메일을 인증해주세요');
-                        firebase.auth().singOut();
+                        firebase.auth().signOut();
                     }else{
                         if (location.href.startsWith('https://franknoh.github.io/login?redirect=')) {
                             location.href = location.href.substring('https://franknoh.github.io/login?redirect='.length); //로그인 후 이동
