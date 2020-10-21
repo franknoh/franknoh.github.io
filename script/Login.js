@@ -2,10 +2,10 @@ function login() {
     var _email;
     $('button#complete').click(function(event) {
         event.preventDefault();
-        firebase.database().ref().once("value").then(function(snapshot) {
+        firebase.database().collection('users').get().then(function(snapshot) {
             snapshot.forEach(function(childSnapshot) {
-                if (childSnapshot.val().nickname == $('#id').val().replace(/ /g, "")) {
-                    _email = childSnapshot.val().email;
+                if (childSnapshot.data().nickname == $('#id').val().replace(/ /g, "")) {
+                    _email = childSnapshot.data().email;
                 }
             })
         }).then(function() {
