@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <title>테셀레이션</title>
+</head>
+
+<body>
+  <div>
+    <canvas id="canvas"></canvas>
+    <select id="select">
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="6">6</option>
+    </select>
+    <input type="range" min="50" max="300" value="100" id="range">
+  </div>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width = window.innerWidth * 0.9;
+    const height = canvas.height = window.innerHeight * 0.9;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    let n = parseInt(select.value);
+    let l = parseInt(range.value);
+    select.addEventListener('change', function() {
+      n = parseInt(select.value);
+      dots = [];
+      stroke_num = 0;
+      drawGrid();
+    });
+    range.addEventListener('mousemove', function() {
+      l = parseInt(range.value);
+      drawGrid();
+      drawLine();
+    });
+    range.addEventListener('touchmove', function() {
+      l = parseInt(range.value);
+      drawGrid();
+      drawLine();
+    });
+    let dots = [];
+    let stroke_num = 0;
+    let currX = 0;
+    let currY = 0;
+    let prevX = 0;
+    let prevY = 0;
+    let flag = false;
+    let dot_flag = false;
+    canvas.addEventListener("mousemove", function(e) {
+      findxy('move', e)
+    }, false);
+    canvas.addEventListener("touchmove", function(e) {
+      findxy('move', e)
+    }, false);
+    canvas.addEventListener("mousedown", function(e) {
+      findxy('down', e)
+    }, false);
+    canvas.addEventListener("mouseup", function(e) {
+      findxy('up', e)
+    }, false);
+    canvas.addEventListener("touchstart", function(e) {
+      findxy('down', e)
+    }, false);
+    canvas.addEventListener("touchend", function(e) {
+      findxy('up', e)
+    }, false);
+    canvas.addEventListener("mouseout", function(e) {
+      findxy('out', e)
+    }, false);
+
+    function findxy(res, e) {
+      if (res == 'down') {
+        prevX = currX;
+        prevY = currY;
+        currX = (e.clientX - canvas.offsetLeft - centerX) / l;
+        currY = (e.clientY - canvas.offsetTop - centerY) / l;
+        if (n == 3) {
+          if (currY > 1 / Math.sqrt(3) / 2) {
+            stroke_num++;
+            return;
+          }
+          if (currY + currX * Math.sqrt(3) + 1 / Math.sqrt(3) < 0) {
+            stroke_num++;
+            return;
+          }
+          if (currY - currX * Math.sqrt(3) + 1 / Math.sqrt(3) < 0) {
+            stroke_num++;
+            return;
+          }
+        } else if (n == 4) {
+          if (currY > 1 / 2) {
+            stroke_num++;
+            return;
+          }
+          if (currY < -1 / 2) {
+            stroke_num++;
+            return;
+          }
+          if (currX > 1 / 2) {
+            stroke_num++;
+            return;
+          }
+          if (currX < -1 / 2) {
+            stroke_num++;
+            return;
+          }
+        } else if (n == 6) {
+          if (currY > Math.sqrt(3) / 2) {
+            stroke_num++;
+            return;
+          }
+          if (currY < -Math.sqrt(3) / 2) {
+            stroke_num++;
+            return;
+          }
+          if (currX > 1) {
+            stroke_num++;
+            return;
+          }
+          if (currX < -1) {
+            stroke_num++;
+            return;
+          }
+          if (currY + currX * Math.sqrt(3) + Math.sqrt(3) < 0) {
+            stroke_num++;
+            return;
+          }
+          if (currY - currX * Math.sqrt(3) + Math.sqrt(3) < 0) {
+            stroke_num++;
+            return;
+          }
+          if (currY + currX * Math.sqrt(3) - Math.sqrt(3) > 0) {
+            stroke_num++;
+            return;
+          }
+          if (currY - currX * Math.sqrt(3) - Math.sqrt(3) > 0) {
+            stroke_num++;
+            return;
+          }
+        }
+        let dot = {
+          x: currX,
+          y: currY,
+          strokeIdx: stroke_num
+        };
+        dots.push(dot);
+        flag = true;
+        dot_flag = true;
+        if (dot_flag) {
+          ctx.beginPath();
+          ctx.fillRect(currX * l + centerX, currY * l + centerY, 2, 2);
+          ctx.closePath();
+          dot_flag = false;
+        }
+      }
+      if (res == 'up' || res == "out") {
+        flag = false;
+        stroke_num++;
+      }
+      if (res == 'move') {
+        if (flag) {
+          prevX = currX;
+          prevY = currY;
+          if (!e.clientX || !e.clientY) {
+            if (e.touches[0]) {
+              currX = (e.touches[0].clientX - canvas.offsetLeft - centerX) / l;
+              currY = (e.touches[0].clientY - canvas.offsetTop - centerY) / l;
+            }
+          } else {
+            currX = (e.clientX - canvas.offsetLeft - centerX) / l;
+            currY = (e.clientY - canvas.offsetTop - centerY) / l;
+          }
+          if (n == 3) {
+            if (currY > 1 / Math.sqrt(3) / 2) {
+              stroke_num++;
+              return;
+            }
+            if (currY + currX * Math.sqrt(3) + 1 / Math.sqrt(3) < 0) {
+              stroke_num++;
+              return;
+            }
+            if (currY - currX * Math.sqrt(3) + 1 / Math.sqrt(3) < 0) {
+              stroke_num++;
+              return;
+            }
+          } else if (n == 4) {
+            if (currY > 1 / 2) {
+              stroke_num++;
+              return;
+            }
+            if (currY < -1 / 2) {
+              stroke_num++;
+              return;
+            }
+            if (currX > 1 / 2) {
+              stroke_num++;
+              return;
+            }
+            if (currX < -1 / 2) {
+              stroke_num++;
+              return;
+            }
+          } else if (n == 6) {
+            if (currY > Math.sqrt(3) / 2) {
+              stroke_num++;
+              return;
+            }
+            if (currY < -Math.sqrt(3) / 2) {
+              stroke_num++;
+              return;
+            }
+            if (currX > 1) {
+              stroke_num++;
+              return;
+            }
+            if (currX < -1) {
+              stroke_num++;
+              return;
+            }
+            if (currY + currX * Math.sqrt(3) + Math.sqrt(3) < 0) {
+              stroke_num++;
+              return;
+            }
+            if (currY - currX * Math.sqrt(3) + Math.sqrt(3) < 0) {
+              stroke_num++;
+              return;
+            }
+            if (currY + currX * Math.sqrt(3) - Math.sqrt(3) > 0) {
+              stroke_num++;
+              return;
+            }
+            if (currY - currX * Math.sqrt(3) - Math.sqrt(3) > 0) {
+              stroke_num++;
+              return;
+            }
+          }
+          let dot = {
+            x: currX,
+            y: currY,
+            strokeIdx: stroke_num
+          };
+          dots.push(dot);
+          drawGrid();
+          drawLine();
+        }
+      }
+    }
+
+    function drawLine() {
+      let currStrokeIdx = 0;
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+      if (dots.length == 0)
+        return;
+      if (n == 3) {
+        for (let i = -Math.ceil(centerY / l); i < Math.ceil(centerY / l) + 1; i++) {
+          for (let j = -Math.ceil(centerX / l); j < Math.ceil(centerX / l) + 1; j++) {
+            if (i == 0 && j == 0)
+              continue;
+            if (i % 2 == 0) {
+              ctx.beginPath();
+              ctx.moveTo(dots[0].x * l + centerX + j * l, dots[0].y * l + centerY + i * l * Math.sqrt(3) / 2);
+              for (let k = 0; k < dots.length; k++) {
+                let dot = dots[k];
+                if (dot.strokeIdx != currStrokeIdx) {
+                  ctx.stroke();
+                  ctx.beginPath();
+                  ctx.moveTo(dot.x * l + centerX + j * l, dot.y * l + centerY + i * l * Math.sqrt(3) / 2);
+                  currStrokeIdx = dot.strokeIdx;
+                }
+                ctx.lineTo(dot.x * l + centerX + j * l, dot.y * l + centerY + i * l * Math.sqrt(3) / 2);
+              }
+              ctx.stroke();
+              ctx.beginPath();
+              ctx.moveTo(dots[0].x * l + centerX + j * l + l / 2, dots[0].y * l + centerY + i * l * Math.sqrt(3) / 2 + l * Math.sqrt(3) / 2);
+              for (let k = 0; k < dots.length; k++) {
+                let dot = dots[k];
+                if (dot.strokeIdx != currStrokeIdx) {
+                  ctx.stroke();
+                  ctx.beginPath();
+                  ctx.moveTo(dot.x * l + centerX + j * l + l / 2, dot.y * l + centerY + i * l * Math.sqrt(3) / 2 + l * Math.sqrt(3) / 2);
+                  currStrokeIdx = dot.strokeIdx;
+                }
+                ctx.lineTo(dot.x * l + centerX + j * l + l / 2, dot.y * l + centerY + i * l * Math.sqrt(3) / 2 + l * Math.sqrt(3) / 2);
+              }
+              ctx.stroke();
+            } else {
+              ctx.beginPath();
+              ctx.moveTo(-dots[0].x * l + centerX + l / 2 + j * l, -dots[0].y * l + centerY + l / Math.sqrt(3) + i * l * Math.sqrt(3) / 2);
+              for (let k = 0; k < dots.length; k++) {
+                let dot = dots[k];
+                if (dot.strokeIdx != currStrokeIdx) {
+                  ctx.stroke();
+                  ctx.beginPath();
+                  ctx.moveTo(-dot.x * l + centerX + l / 2 + j * l, -dot.y * l + centerY + l / Math.sqrt(3) + i * l * Math.sqrt(3) / 2);
+                  currStrokeIdx = dot.strokeIdx;
+                }
+                ctx.lineTo(-dot.x * l + centerX + l / 2 + j * l, -dot.y * l + centerY + l / Math.sqrt(3) + i * l * Math.sqrt(3) / 2);
+              }
+              ctx.stroke();
+              ctx.beginPath();
+              ctx.moveTo(-dots[0].x * l + centerX + j * l, -dots[0].y * l + centerY + i * l * Math.sqrt(3) / 2 - l * Math.sqrt(3) / 6);
+              for (let k = 0; k < dots.length; k++) {
+                let dot = dots[k];
+                if (dot.strokeIdx != currStrokeIdx) {
+                  ctx.stroke();
+                  ctx.beginPath();
+                  ctx.moveTo(-dot.x * l + centerX + j * l, -dot.y * l + centerY + i * l * Math.sqrt(3) / 2 - l * Math.sqrt(3) / 6);
+                  currStrokeIdx = dot.strokeIdx;
+                }
+                ctx.lineTo(-dot.x * l + centerX + j * l, -dot.y * l + centerY + i * l * Math.sqrt(3) / 2 - l * Math.sqrt(3) / 6);
+              }
+              ctx.stroke();
+            }
+          }
+        }
+        ctx.beginPath();
+        ctx.moveTo(dots[0].x * l + centerX + l / 2, dots[0].y * l + centerY + l * Math.sqrt(3) / 2);
+        for (let i = 0; i < dots.length; i++) {
+          let dot = dots[i];
+          if (dot.strokeIdx != currStrokeIdx) {
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(dot.x * l + centerX + l / 2, dot.y * l + centerY + l * Math.sqrt(3) / 2);
+            currStrokeIdx = dot.strokeIdx;
+          }
+          ctx.lineTo(dot.x * l + centerX + l / 2, dot.y * l + centerY + l * Math.sqrt(3) / 2);
+        }
+        ctx.stroke();
+      } else if (n == 4) {
+        for (let i = -Math.ceil(centerY / l); i < Math.ceil(centerY / l) + 1; i++) {
+          for (let j = -Math.ceil(centerX / l); j < Math.ceil(centerX / l) + 1; j++) {
+            if (i == 0 && j == 0)
+              continue;
+            ctx.beginPath();
+            ctx.moveTo(dots[0].x * l + centerX + j * l, dots[0].y * l + centerY + i * l);
+            for (let k = 0; k < dots.length; k++) {
+              let dot = dots[k];
+              if (dot.strokeIdx != currStrokeIdx) {
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(dot.x * l + centerX + j * l, dot.y * l + centerY + i * l);
+                currStrokeIdx = dot.strokeIdx;
+              }
+              ctx.lineTo(dot.x * l + centerX + j * l, dot.y * l + centerY + i * l);
+            }
+            ctx.stroke();
+          }
+        }
+      } else if (n == 6) {
+        for (let i = -Math.ceil(centerY / l); i < Math.ceil(centerY / l) + 1; i++) {
+          for (let j = -Math.ceil(centerX / l); j < Math.ceil(centerX / l) + 1; j++) {
+            if (i == 0 && j == 0)
+              continue;
+            if (i % 2 == 0) {
+              ctx.beginPath();
+              ctx.moveTo(dots[0].x * l + centerX + j * l * 3, dots[0].y * l + centerY + i * l * Math.sqrt(3) / 2);
+              for (let k = 0; k < dots.length; k++) {
+                let dot = dots[k];
+                if (dot.strokeIdx != currStrokeIdx) {
+                  ctx.stroke();
+                  ctx.beginPath();
+                  ctx.moveTo(dot.x * l + centerX + j * l * 3, dot.y * l + centerY + i * l * Math.sqrt(3) / 2);
+                  currStrokeIdx = dot.strokeIdx;
+                }
+                ctx.lineTo(dot.x * l + centerX + j * l * 3, dot.y * l + centerY + i * l * Math.sqrt(3) / 2);
+              }
+              ctx.stroke();
+            } else {
+              ctx.beginPath();
+              ctx.moveTo(dots[0].x * l + centerX + j * l * 3 + l * 3 / 2, dots[0].y * l + centerY + i * l * Math.sqrt(3) / 2);
+              for (let k = 0; k < dots.length; k++) {
+                let dot = dots[k];
+                if (dot.strokeIdx != currStrokeIdx) {
+                  ctx.stroke();
+                  ctx.beginPath();
+                  ctx.moveTo(dot.x * l + centerX + j * l * 3 + l * 3 / 2, dot.y * l + centerY + i * l * Math.sqrt(3) / 2);
+                  currStrokeIdx = dot.strokeIdx;
+                }
+                ctx.lineTo(dot.x * l + centerX + j * l * 3 + l * 3 / 2, dot.y * l + centerY + i * l * Math.sqrt(3) / 2);
+              }
+              ctx.stroke();
+            }
+          }
+        }
+      }
+      ctx.strokeStyle = 'rgba(255, 0, 0, 1)';
+      ctx.beginPath();
+      ctx.moveTo(dots[0].x * l + centerX, dots[0].y * l + centerY);
+      for (let i = 0; i < dots.length; i++) {
+        let dot = dots[i];
+        if (dot.strokeIdx != currStrokeIdx) {
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(dot.x * l + centerX, dot.y * l + centerY);
+          currStrokeIdx = dot.strokeIdx;
+        }
+        ctx.lineTo(dot.x * l + centerX, dot.y * l + centerY);
+      }
+      ctx.stroke();
+    }
+
+    function drawTriangle(x, y) {
+      ctx.beginPath();
+      ctx.moveTo(centerX + x * l, centerY - l / Math.sqrt(3) + y * l * Math.sqrt(3) / 2);
+      ctx.lineTo(centerX + l / 2 + x * l, centerY + l / 2 / Math.sqrt(3) + y * l * Math.sqrt(3) / 2);
+      ctx.lineTo(centerX - l / 2 + x * l, centerY + l / 2 / Math.sqrt(3) + y * l * Math.sqrt(3) / 2);
+      ctx.lineTo(centerX + x * l, centerY - l / Math.sqrt(3) + y * l * Math.sqrt(3) / 2);
+      ctx.stroke();
+    }
+
+    function drawRectangle(x, y) {
+      ctx.beginPath();
+      ctx.moveTo(centerX - l / 2 + x * l, centerY - l / 2 + y * l);
+      ctx.lineTo(centerX + l / 2 + x * l, centerY - l / 2 + y * l);
+      ctx.lineTo(centerX + l / 2 + x * l, centerY + l / 2 + y * l);
+      ctx.lineTo(centerX - l / 2 + x * l, centerY + l / 2 + y * l);
+      ctx.lineTo(centerX - l / 2 + x * l, centerY - l / 2 + y * l);
+      ctx.stroke();
+    }
+
+    function drawHexagon(x, y) {
+      ctx.beginPath();
+      ctx.moveTo(centerX - l + x * l * 3, centerY + y * l * Math.sqrt(3) / 2);
+      ctx.lineTo(centerX - l / 2 + x * l * 3, centerY + l * Math.sqrt(3) / 2 + y * l * Math.sqrt(3) / 2);
+      ctx.lineTo(centerX + l / 2 + x * l * 3, centerY + l * Math.sqrt(3) / 2 + y * l * Math.sqrt(3) / 2);
+      ctx.lineTo(centerX + l + x * l * 3, centerY + y * l * Math.sqrt(3) / 2);
+      ctx.lineTo(centerX + l / 2 + x * l * 3, centerY - l * Math.sqrt(3) / 2 + y * l * Math.sqrt(3) / 2);
+      ctx.lineTo(centerX - l / 2 + x * l * 3, centerY - l * Math.sqrt(3) / 2 + y * l * Math.sqrt(3) / 2);
+      ctx.lineTo(centerX - l + x * l * 3, centerY + y * l * Math.sqrt(3) / 2);
+      ctx.stroke();
+    }
+
+    function drawGrid() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.lineWidth = 0.5;
+      if (n == 3) {
+        for (let i = -Math.ceil(centerY / l); i < Math.ceil(centerY / l) + 1; i++) {
+          for (let j = -Math.ceil(centerX / l); j < Math.ceil(centerX / l) + 1; j++) {
+            if (i % 2 == 0) {
+              drawTriangle(j, i);
+            } else {
+              drawTriangle(j + 1 / 2, i);
+            }
+          }
+        }
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+        ctx.lineWidth = 2;
+        drawTriangle(0, 0);
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.lineWidth = 0.5;
+      } else if (n == 4) {
+        for (let i = -Math.ceil(centerY / l); i < Math.ceil(centerY / l) + 1; i++) {
+          for (let j = -Math.ceil(centerX / l); j < Math.ceil(centerX / l) + 1; j++) {
+            drawRectangle(j, i);
+          }
+        }
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+        ctx.lineWidth = 2;
+        drawRectangle(0, 0);
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.lineWidth = 0.5;
+      } else if (n == 6) {
+        for (let i = -Math.ceil(centerY / l); i < Math.ceil(centerY / l) + 1; i++) {
+          for (let j = -Math.ceil(centerX / l); j < Math.ceil(centerX / l) + 1; j++) {
+            if (i % 2 == 0) {
+              drawHexagon(j, i);
+            } else {
+              drawHexagon(j + 1 / 2, i);
+            }
+          }
+        }
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+        ctx.lineWidth = 2;
+        drawHexagon(0, 0);
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.lineWidth = 0.5;
+      }
+    }
+    drawGrid();
+  </script>
+</body>
+
+</html>
